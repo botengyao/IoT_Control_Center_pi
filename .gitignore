@@ -1,5 +1,5 @@
-/idendify_people/DataSet/*
-/idendify_people/Test/*
-/idendify_people/training-data/*
+/identify_people/DataSet/*
+/identify_people/Test/*
+/identify_people/training-data/*
 /training-data
-__pycache__
+/__pycache__
