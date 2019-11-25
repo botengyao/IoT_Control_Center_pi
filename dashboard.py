@@ -29,7 +29,7 @@ LIGHT = 'light'
 def dash_board(GPIO):
 #def dash_board():
 # Set to your Adafruit IO key & username below
-
+    lock=threading.Lock()
     #GPIO.setmode(GPIO.BCM) # Use physical pin numbering
     #GPIO.setup(17, GPIO.OUT, initial=GPIO.LOW) # Set pin 8 to be an output pin and set initial value to low (off)
     # Define callback functions which will be called when certain events happen.
@@ -65,12 +65,15 @@ def dash_board(GPIO):
                 publish_init()
                 glo.start_system = True
             else:
-                publish_off()
                 glo.start_system = False
+                publish_off()  
+
         elif feed_id == 'auto':
             if payload=='Auto':
+                print("System has been changed to Auto model")
                 glo.auto_start = True
             elif payload=='Manul':
+                print("System has been changed to Manul model")
                 glo.auto_start = False
 
         if glo.start_system and not glo.auto_start:
@@ -119,36 +122,36 @@ def dash_board(GPIO):
                     pass
 
     def publish_init():
-        time.sleep(0.5)
+        time.sleep(1)
+        lock.acquire()
         client.publish(ACTEM, 26)
         client.publish(AUTO, "Auto")
-        time.sleep(0.5)
+        time.sleep(1)
         #client.publish(ACON, "OFF")
         client.publish(DOOR, "OFF")
         #client.publish("humidity", glo.humid)
-        time.sleep(0.5)
-        #client.publish("temperature", glo.temp)
-        #client.publish("lux", glo.light)
-        #client.publish(LIGHT, "OFF")
-        time.sleep(0.5)
+        time.sleep(1)
         client.publish(HUMID, 0)
+        lock.release()
     
     def publish_off():
         time.sleep(1)
         #client.publish(SYSTEMON, "ON")
         client.publish(AUTO, "Manul")
-        time.sleep(0.5)
+        glo.auto_start = False
+        lock.acquire()
+
+        time.sleep(1)
         client.publish(ACON, "OFF")
-        time.sleep(0.5)
+        time.sleep(1)
         client.publish(DOOR, "OFF")
-        #client.publish("humidity", glo.humid)
-        time.sleep(0.5)
-        #client.publish("temperature", glo.temp)
-        #client.publish("lux", glo.light)
+        time.sleep(1)
         client.publish(LIGHT, "OFF")
-        time.sleep(0.5)
+        GPIO.output(26, GPIO.LOW)
+        time.sleep(1)
         client.publish(HUMID, 0)
 
+        lock.release()
     # Create an MQTT client instance.
     client = MQTTClient(ADAFRUIT_IO_USERNAME, ADAFRUIT_IO_KEY)
 
@@ -164,43 +167,6 @@ def dash_board(GPIO):
     time.sleep(1)
     client.publish(SYSTEMON, "ON")
 
-    def auto_control():
-        while glo.code_run:
-            print(glo.start_system)
-            print("auto: " + str(glo.auto_start))
-            if glo.start_system and glo.auto_start:
-                if glo.temp and glo.humid:
-                    print("temp: " + str(glo.temp))
-                    if glo.temp < 20:
-                        print("Opend the AC")
-                        client.publish(ACON, "ON")
-                    else:
-                        print("Close the AC")
-                        client.publish(ACON, "OFF")    
-                    #time.sleep(2)
-                    print("humid: " + str(glo.humid))
-                    if glo.humid < 10:
-                        print("Level1")
-                        client.publish(HUMID, 5)
-                    elif glo.humid < 20:
-                        print("Level2")
-                        client.publish(HUMID, 3)
-                    elif glo.humid < 30:
-                        client.publish(HUMID, 1)
-                    else:
-                        client.publish(HUMID, 0)
-
-                #time.sleep(2)
-                print("Light: " + str(glo.light))
-                if glo.light < 400:
-                    client.publish(LIGHT, "ON")
-                    GPIO.output(26, GPIO.HIGH)
-                else:
-                    client.publish(LIGHT, "OFF")
-                    GPIO.output(26, GPIO.LOW)
-
-            time.sleep(10)
-
     def update_status():
         while glo.code_run:
             client.publish("humidity", glo.humid)
@@ -211,14 +177,47 @@ def dash_board(GPIO):
             time.sleep(10)
 
     time.sleep(0.3)
-    t_control = threading.Thread(target=auto_control, name='control_system')
-    t_control.start()
 
     t_dash = threading.Thread(target=update_status, name='status')
     t_dash.start()
 
     while glo.code_run:
-        pass
+        print(glo.start_system)
+        print("auto: " + str(glo.auto_start))
+        
+        if glo.start_system and glo.auto_start:
+            print("temp: " + str(glo.temp))
+            lock.acquire()
+            if glo.temp > 30:
+                print("Opend the AC")
+                client.publish(ACON, "ON")
+            else:
+                print("Close the AC")
+                client.publish(ACON, "OFF")    
+            time.sleep(1)
+            print("humid: " + str(glo.humid))
+            if glo.humid < 10:
+                print("Level1")
+                client.publish(HUMID, 5)
+            elif glo.humid < 20:
+                print("Level2")
+                client.publish(HUMID, 3)
+            elif glo.humid < 30:
+                client.publish(HUMID, 1)
+            else:
+                client.publish(HUMID, 0)
+
+            time.sleep(1)
+            print("Light: " + str(glo.light))
+            if glo.light < 500:
+                client.publish(LIGHT, "ON")
+                GPIO.output(26, GPIO.HIGH)
+            else:
+                client.publish(LIGHT, "OFF")
+                GPIO.output(26, GPIO.LOW)
+            lock.release()
+        time.sleep(10)
+
     GPIO.cleanup()
     #t_control.join()
     #t_dash.join()
