@@ -1,5 +1,5 @@
 /identify_people/DataSet/*
 /identify_people/Test/*
 /identify_people/training-data/*
-/training-data
+/training-data/*
 /__pycache__
