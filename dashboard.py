@@ -25,7 +25,6 @@ HUMID = 'humidifier'
 SYSTEMON = 'onoffbutton'
 LIGHT = 'light'
 
-
 def dash_board(GPIO):
 #def dash_board():
 # Set to your Adafruit IO key & username below
@@ -69,33 +68,47 @@ def dash_board(GPIO):
                 publish_off()  
 
         elif feed_id == 'auto':
-            if payload=='Auto':
+            if payload == 'Auto':
                 print("System has been changed to Auto model")
                 glo.auto_start = True
-            elif payload=='Manul':
-                print("System has been changed to Manul model")
+            elif payload =='Manual':
+                print("System has been changed to Manual model")
                 glo.auto_start = False
 
         if glo.start_system and not glo.auto_start:
-            #if feed_id != "auto":
-                #auto_start = Falses
-            if feed_id == 'ac':
-                print(payload)
-                if payload >= 20:
-                    print("level 2")
-                elif payloat < 20:
-                    print("level 1")
+            if feed_id == "ac":
+                print("feed_id == ac : {} ac_on: {}".format(feed_id == "ac", glo.ac_on))       
+                if glo.ac_on:
+                    glo.set_temp = int(payload)
+                    print("AC has been changed to " + payload)
+                    period = 21.5 + 0.2 *((33 - glo.set_temp)/16)
+                    glo.ac.ChangeFrequency(1000/period)
+                    glo.ac.ChangeDutyCycle(100 * (period - 20)/period)
             elif feed_id == "aconoff":
                 if payload=='ON':
-                    print("ON")
+                    glo.ac_on = True
+                    client.publish(ACTEM, glo.set_temp)
+                    period = 21.5 + 0.2 *((33 - glo.set_temp)/16)
+                    glo.ac.ChangeFrequency(1000/period)
+                    glo.ac.ChangeDutyCycle(100 * (period - 20)/period)
+                    print("AC ON")
                 elif payload=='OFF':
-                    print("OFF")
+                    glo.ac_on = False
+                    print("AC OFF")
+                    glo.ac.ChangeDutyCycle(0)
             
             elif feed_id == 'door':
                 if payload=='Close':
-                    print(feed_id)
+                    print("close door")
+                    glo.door.ChangeFrequency(1000/21.6)
+                    glo.door.ChangeDutyCycle(100 * 1.6/21.6)
+                    time.sleep(1)
+                    glo.door.ChangeDutyCycle(0)
                 elif payload=='Open':
-                    print(feed_id)       
+                    glo.door.ChangeFrequency(1000/21.4)
+                    glo.door.ChangeDutyCycle(100 * 1.4/21.4)   
+                    time.sleep(1)
+                    glo.door.ChangeDutyCycle(0) 
             elif feed_id == 'light':
                 if payload=='ON':
                     print(feed_id)
@@ -131,6 +144,7 @@ def dash_board(GPIO):
     def publish_init():
         time.sleep(1)
         lock.acquire()
+        glo.ac_on = True
         client.publish(ACTEM, 26)
         client.publish(AUTO, "Auto")
         time.sleep(1)
@@ -145,17 +159,23 @@ def dash_board(GPIO):
     def publish_off():
         time.sleep(1)
         #client.publish(SYSTEMON, "ON")
-        client.publish(AUTO, "Manul")
+        client.publish(AUTO, "Manual")
         glo.auto_start = False
         lock.acquire()
 
         time.sleep(1)
         client.publish(ACON, "OFF")
+
+        glo.ac_on = False
+        glo.ac.ChangeDutyCycle(0)
+
         time.sleep(1)
         client.publish(DOOR, "OFF")
+        
         time.sleep(1)
         client.publish(LIGHT, "OFF")
         GPIO.output(26, GPIO.LOW)
+
         time.sleep(1)
         client.publish(HUMID, 0)
         glo.hum.ChangeDutyCycle(0)
@@ -198,11 +218,26 @@ def dash_board(GPIO):
             print("temp: " + str(glo.temp))
             lock.acquire()
             if glo.temp > 30:
-                print("Opend the AC")
+                glo.set_temp = 22
+                glo.ac_on = True
                 client.publish(ACON, "ON")
+                period = 21.5 + 0.2 *((33 - glo.set_temp)/16)
+                glo.ac.ChangeFrequency(1000/period)
+                glo.ac.ChangeDutyCycle(100 * (period - 20)/period)
+                client.publish(ACTEM, 22)
+            elif glo.temp > 24:
+                glo.set_temp = 25
+                glo.ac_on = True
+                client.publish(ACON, "ON")
+                period = 21.5 + 0.2 *((33 - glo.set_temp)/16)
+                glo.ac.ChangeFrequency(1000/period)
+                glo.ac.ChangeDutyCycle(100 * (period - 20)/period) 
+                client.publish(ACTEM, 25)
             else:
                 print("Close the AC")
-                client.publish(ACON, "OFF")    
+                client.publish(ACON, "OFF") 
+                glo.ac_on = False
+                glo.ac.ChangeDutyCycle(0)          
             time.sleep(1)
             print("humid: " + str(glo.humid))
             if glo.humid < 10:

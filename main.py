@@ -38,9 +38,18 @@ GPIO.setup(17, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 GPIO.setup(27, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 GPIO.setup(26, GPIO.OUT, initial=GPIO.LOW)
 GPIO.setup(5, GPIO.OUT)
+GPIO.setup(6, GPIO.OUT)  #Ac
+GPIO.setup(12, GPIO.OUT) #Door
+
 
 glo.hum = GPIO.PWM(5, 10)
 glo.hum.start(50)
+
+glo.door = GPIO.PWM(12, 1000/21.5)
+glo.door.start(0)
+
+glo.ac = GPIO.PWM(6, 1000/21.5)
+glo.ac.start(0)
 
 start_time = time.time()
 
@@ -123,13 +132,23 @@ while glo.code_run:
 
     if level == 2:
         #GPIO.output(26, GPIO.HIGH)
+        glo.door.ChangeFrequency(1000/21.6)
+        glo.door.ChangeDutyCycle(100 * 1.6/21.6)
+
         screen.fill(WHITE) 
         for my_text, text_pos in welcome.items():
             text_surface = my_font.render(my_text, True, BLACK)
             rect = text_surface.get_rect(center=text_pos)
             screen.blit(text_surface, rect)
+
         time.sleep(1)
-        #GPIO.output(26, GPIO.LOW)
+        glo.door.ChangeDutyCycle(0)
+
+        time.sleep(3)
+        glo.door.ChangeFrequency(1000/21.4)
+        glo.door.ChangeDutyCycle(100 * 1.4/21.4)
+        time.sleep(1.1)
+        glo.door.ChangeDutyCycle(0)
         level = 4
     
     if level == 3:

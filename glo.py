@@ -6,3 +6,6 @@ humid = 0
 light = 0
 hum = 0
 door = 0
+ac = 0
+ac_on = False
+set_temp = 26

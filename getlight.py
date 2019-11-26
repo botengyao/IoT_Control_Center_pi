@@ -11,7 +11,7 @@ def getLight():
         rc.direction = Direction.OUTPUT
         rc.value = False
 
-        time.sleep(0.2)
+        time.sleep(1)
 
         # setup pin as input and wait for low value
         rc.direction = Direction.INPUT
@@ -21,6 +21,7 @@ def getLight():
             reading += 1
             if(reading >= 10000):
                 break
-        return reading
-        #print(reading)
+       # print(reading)
+        return reading / 2
+       
 
