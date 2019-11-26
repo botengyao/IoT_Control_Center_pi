@@ -106,20 +106,27 @@ def dash_board(GPIO):
                     print("OFF")
                     GPIO.output(26, GPIO.LOW) 
             elif feed_id == "humidifier":
-                print(payload)
-                if payload == 0:
-                    pass
+                #print(payload)
+                if payload == "0":
+                    print(payload)
+                    glo.hum.ChangeDutyCycle(0)
                     #GPIO.output(17, GPIO.HIGH) # Turn on
-                elif payload == 1:
-                    pass
-                elif payload == 2:
-                    pass
-                elif payload == 3:
-                    pass
-                elif payload == 4:
-                    pass
+                elif payload == "1":
+                    print(payload)
+                    glo.hum.ChangeFrequency(5)
+                    glo.hum.ChangeDutyCycle(50)
+                elif payload == "2":
+                    glo.hum.ChangeFrequency(8)
+                    glo.hum.ChangeDutyCycle(50)
+                elif payload == "3":
+                    glo.hum.ChangeFrequency(10)
+                    glo.hum.ChangeDutyCycle(50)
+                elif payload == "4":
+                    glo.hum.ChangeFrequency(15)
+                    glo.hum.ChangeDutyCycle(50)
                 else:
-                    pass
+                    glo.hum.ChangeFrequency(20)
+                    glo.hum.ChangeDutyCycle(50)
 
     def publish_init():
         time.sleep(1)
@@ -132,6 +139,7 @@ def dash_board(GPIO):
         #client.publish("humidity", glo.humid)
         time.sleep(1)
         client.publish(HUMID, 0)
+        glo.hum.ChangeDutyCycle(0)
         lock.release()
     
     def publish_off():
@@ -150,6 +158,7 @@ def dash_board(GPIO):
         GPIO.output(26, GPIO.LOW)
         time.sleep(1)
         client.publish(HUMID, 0)
+        glo.hum.ChangeDutyCycle(0)
 
         lock.release()
     # Create an MQTT client instance.
@@ -182,7 +191,7 @@ def dash_board(GPIO):
     t_dash.start()
 
     while glo.code_run:
-        print(glo.start_system)
+        print("system" + str(glo.start_system))
         print("auto: " + str(glo.auto_start))
         
         if glo.start_system and glo.auto_start:
@@ -199,13 +208,20 @@ def dash_board(GPIO):
             if glo.humid < 10:
                 print("Level1")
                 client.publish(HUMID, 5)
+                glo.hum.ChangeFrequency(20)
+                glo.hum.ChangeDutyCycle(50)
             elif glo.humid < 20:
                 print("Level2")
                 client.publish(HUMID, 3)
+                glo.hum.ChangeFrequency(10)
+                glo.hum.ChangeDutyCycle(50)
             elif glo.humid < 30:
                 client.publish(HUMID, 1)
+                glo.hum.ChangeFrequency(5)
+                glo.hum.ChangeDutyCycle(50)
             else:
                 client.publish(HUMID, 0)
+                glo.hum.ChangeDutyCycle(0)
 
             time.sleep(1)
             print("Light: " + str(glo.light))

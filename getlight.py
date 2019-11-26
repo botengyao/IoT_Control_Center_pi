@@ -11,7 +11,7 @@ def getLight():
         rc.direction = Direction.OUTPUT
         rc.value = False
 
-        time.sleep(0.5)
+        time.sleep(0.2)
 
         # setup pin as input and wait for low value
         rc.direction = Direction.INPUT

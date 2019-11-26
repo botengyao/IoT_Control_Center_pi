@@ -37,6 +37,10 @@ GPIO.setmode(GPIO.BCM)
 GPIO.setup(17, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 GPIO.setup(27, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 GPIO.setup(26, GPIO.OUT, initial=GPIO.LOW)
+GPIO.setup(5, GPIO.OUT)
+
+glo.hum = GPIO.PWM(5, 10)
+glo.hum.start(50)
 
 start_time = time.time()
 
