@@ -28,8 +28,8 @@ class status:
         self.code_run = True
 '''
 
-#os.putenv('SDL_VIDEODRIVER', 'fbcon')
-#os.putenv('SDL_FBDEV', '/dev/fb1')
+os.putenv('SDL_VIDEODRIVER', 'fbcon')
+os.putenv('SDL_FBDEV', '/dev/fb1')
 os.putenv('SDL_MOUSEDRV', 'TSLIB') # Track mouse clicks on piTFT
 os.putenv('SDL_MOUSEDEV', '/dev/input/touchscreen')
 
@@ -62,14 +62,15 @@ window_size = (width, height) = (320, 240)
 WHITE = 255, 255, 255
 BLACK = 0,0,0
 screen = pygame.display.set_mode(window_size)
-my_font = pygame.font.Font(None, 22)
+#my_font = pygame.font.Font(None, 22)
+my_font = pygame.font.SysFont("monospace", 22)
 
-start_face = {'Start face recorgnization':(120,120)}
-iot_system = {'Iot system 1.0' :(120,120)}
-please_retry = {'Please retry':(120,120)}
-welcome = {'welcome to back home':(120,120)}
+start_face = {'Face recorgnizing':(140,120)}
+iot_system = {'IoT system 1.0' :(140,120)}
+please_retry = {'Please retry':(140,120)}
+welcome = {'welcome! ':(140,120)}
 temp_humid = ["temperature: ", "humidility: "]
-position = [(120, 80), (120, 160)]
+position = [(140, 80), (140, 160)]
 
 s_per_sec = 10
 fps_clock = pygame.time.Clock()
@@ -113,9 +114,9 @@ while glo.code_run:
             glo.code_run = False # Here we exit the Loop and execute what after.
             
     if level == 0:
-        screen.fill(WHITE) 
+        screen.fill(BLACK) 
         for my_text, text_pos in iot_system.items():
-            text_surface = my_font.render(my_text, True, BLACK)
+            text_surface = my_font.render(my_text, True, WHITE)
             rect = text_surface.get_rect(center=text_pos)
             screen.blit(text_surface, rect)
 
@@ -124,9 +125,9 @@ while glo.code_run:
         level = 4
 
     if level == 1:
-        screen.fill(WHITE) 
+        screen.fill(BLACK) 
         for my_text, text_pos in start_face.items():
-            text_surface = my_font.render(my_text, True, BLACK)
+            text_surface = my_font.render(my_text, True, WHITE)
             rect = text_surface.get_rect(center=text_pos)
             screen.blit(text_surface, rect)
 
@@ -135,26 +136,26 @@ while glo.code_run:
         glo.door.ChangeFrequency(1000/21.6)
         glo.door.ChangeDutyCycle(100 * 1.6/21.6)
 
-        screen.fill(WHITE) 
+        screen.fill(BLACK) 
         for my_text, text_pos in welcome.items():
-            text_surface = my_font.render(my_text, True, BLACK)
+            text_surface = my_font.render(my_text, True, WHITE)
             rect = text_surface.get_rect(center=text_pos)
             screen.blit(text_surface, rect)
 
-        time.sleep(1)
+        time.sleep(0.65)
         glo.door.ChangeDutyCycle(0)
 
         time.sleep(3)
         glo.door.ChangeFrequency(1000/21.4)
         glo.door.ChangeDutyCycle(100 * 1.4/21.4)
-        time.sleep(1.1)
+        time.sleep(0.37)
         glo.door.ChangeDutyCycle(0)
         level = 4
     
     if level == 3:
-        screen.fill(WHITE) 
+        screen.fill(BLACK) 
         for my_text, text_pos in please_retry.items():
-            text_surface = my_font.render(my_text, True, BLACK)
+            text_surface = my_font.render(my_text, True, WHITE)
             rect = text_surface.get_rect(center=text_pos)
             screen.blit(text_surface, rect)
         time.sleep(1)
@@ -165,9 +166,9 @@ while glo.code_run:
         #print(humid)
         temp_humid[0] = "Temperature: " + str(glo.temp)
         temp_humid[1] = "Humidity: " + str(glo.humid) 
-        screen.fill(WHITE)
+        screen.fill(BLACK)
         for i in range(len(temp_humid)):
-            text_surface = my_font.render(temp_humid[i], True, BLACK)
+            text_surface = my_font.render(temp_humid[i], True, WHITE)
             rect = text_surface.get_rect(center=position[i])
             screen.blit(text_surface, rect)
 

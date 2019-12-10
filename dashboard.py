@@ -102,12 +102,12 @@ def dash_board(GPIO):
                     print("close door")
                     glo.door.ChangeFrequency(1000/21.6)
                     glo.door.ChangeDutyCycle(100 * 1.6/21.6)
-                    time.sleep(1)
+                    time.sleep(0.37)
                     glo.door.ChangeDutyCycle(0)
                 elif payload=='Open':
                     glo.door.ChangeFrequency(1000/21.4)
                     glo.door.ChangeDutyCycle(100 * 1.4/21.4)   
-                    time.sleep(1)
+                    time.sleep(0.65)
                     glo.door.ChangeDutyCycle(0) 
             elif feed_id == 'light':
                 if payload=='ON':
