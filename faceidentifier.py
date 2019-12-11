@@ -13,8 +13,8 @@ def fact_detection(recognizer, faceCascade, start):
     Id = 0
     end = time.time()
     with PiCamera() as camera:
-        camera.resolution = (608, 608)
-        rawCapture = PiRGBArray(camera, size=( 608, 608 ) )
+        camera.resolution = (600, 600)
+        rawCapture = PiRGBArray(camera, size=(600, 600))
         #stream = io.BytesIO()
         for frame in camera.capture_continuous( rawCapture, format="bgr", use_video_port=True ):
             image = frame.array    

@@ -28,9 +28,9 @@ def open_preview():
         camera.resolution = (600, 600)
 
         camera.start_preview()
-        for i in range(50):
-            sleep(1)
-            camera.capture(str(i) + "boteng" + ".jpg", resize=(600, 600))
+        for i in range(100):
+            sleep(0.6)
+            camera.capture(str(i) + "ziran" + ".jpg", resize=(600, 600))
 
 if __name__ == '__main__':
     open_preview()

@@ -28,8 +28,8 @@ class status:
         self.code_run = True
 '''
 
-os.putenv('SDL_VIDEODRIVER', 'fbcon')
-os.putenv('SDL_FBDEV', '/dev/fb1')
+#os.putenv('SDL_VIDEODRIVER', 'fbcon')
+#os.putenv('SDL_FBDEV', '/dev/fb1')
 os.putenv('SDL_MOUSEDRV', 'TSLIB') # Track mouse clicks on piTFT
 os.putenv('SDL_MOUSEDEV', '/dev/input/touchscreen')
 
@@ -133,8 +133,8 @@ while glo.code_run:
 
     if level == 2:
         #GPIO.output(26, GPIO.HIGH)
-        glo.door.ChangeFrequency(1000/21.6)
-        glo.door.ChangeDutyCycle(100 * 1.6/21.6)
+        glo.door.ChangeFrequency(1000/21.4)
+        glo.door.ChangeDutyCycle(100 * 1.4/21.4) 
 
         screen.fill(BLACK) 
         for my_text, text_pos in welcome.items():
@@ -143,11 +143,12 @@ while glo.code_run:
             screen.blit(text_surface, rect)
 
         time.sleep(0.65)
+        glo.door.ChangeFrequency(1000/21.6)
         glo.door.ChangeDutyCycle(0)
 
         time.sleep(3)
-        glo.door.ChangeFrequency(1000/21.4)
-        glo.door.ChangeDutyCycle(100 * 1.4/21.4)
+        glo.door.ChangeFrequency(1000/21.6)
+        glo.door.ChangeDutyCycle(100 * 1.6/21.6)
         time.sleep(0.37)
         glo.door.ChangeDutyCycle(0)
         level = 4
